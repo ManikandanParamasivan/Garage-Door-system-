@@ -1,0 +1,79 @@
+// BUILD THIS ON MIKROC
+// LCD module connections
+sbit LCD_RS at RB4_bit;
+sbit LCD_EN at RB5_bit;
+sbit LCD_D4 at RB0_bit;
+sbit LCD_D5 at RB1_bit;
+sbit LCD_D6 at RB2_bit;
+sbit LCD_D7 at RB3_bit;
+
+sbit LCD_RS_Direction at TRISB4_bit;
+sbit LCD_EN_Direction at TRISB5_bit;
+sbit LCD_D4_Direction at TRISB0_bit;
+sbit LCD_D5_Direction at TRISB1_bit;
+sbit LCD_D6_Direction at TRISB2_bit;
+sbit LCD_D7_Direction at TRISB3_bit;
+// End LCD module connections
+void main() 
+{
+     int a ;
+     char txt[7];
+     Lcd_Init();
+     Lcd_Cmd(_LCD_CLEAR);       //Clear Display
+     Lcd_Cmd(_LCD_CURSOR_OFF);  // Cursor OFF
+
+     TRISB = 0b00010000;
+     TRISC = 0x00;
+     PORTC=0X00;
+     Lcd_Out(2,1,"Ryujin");
+
+     Delay_ms(3000);
+     Lcd_Cmd(_LCD_CLEAR);
+
+     T1CON = 0x10;
+
+     while(1)
+     {
+         TMR1H = 0;
+         TMR1L = 0;
+
+         PORTB.F0 = 1;
+         Delay_us(10);
+         PORTB.F0 = 0;
+
+         while(!PORTB.F4);
+         T1CON.F0 = 1;
+         while(PORTB.F4);
+         T1CON.F0 = 0;
+
+         a = (TMR1L | (TMR1H<<8))/58.82 +1;
+
+         if(a>=2 && a<=400)
+         {
+            IntToStr(a,txt);
+            Ltrim(txt);
+            Lcd_Cmd(_LCD_CLEAR);
+            Lcd_Out(1,1,"Distance = ");
+            Lcd_Out(1,12,txt);
+            Lcd_Out(1,15,"cm");
+
+            if(a>100 && a<200)
+            {
+               portc=0xFF;
+               delay_ms(500);
+            }
+            else{
+              portc=0x00;
+              delay_ms(500);
+            }
+         }
+         else
+         {
+             Lcd_Cmd(_LCD_CLEAR);
+             Lcd_Out(1,1,"Out of Range");
+         }
+         Delay_ms(400);
+     }
+
+
+}

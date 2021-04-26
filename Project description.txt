@@ -1,0 +1,3 @@
+An PIC microcontroller powered Garage door System which works with the help of ultrasonic Sensor 
+to calculate the distance between the door and the incoming vechile & if the distance is less then certain cm it inalize 
+to open the garage door 
